@@ -1,7 +1,8 @@
 import express, { Express } from 'express';
+import { PrismaClient } from '@prisma/client';
 import { LoginUserUseCase } from '@src/features/auth/application/use-cases/login-user.use-case';
 import { RegisterUserUseCase } from '@src/features/auth/application/use-cases/register-user.use-case';
-import { InMemoryUserRepository } from '@src/features/auth/infrastructure/repositories/in-memory-user-repository';
+import { PrismaUserRepository } from '@src/features/auth/infrastructure/repositories/prisma-user-repository';
 import { BcryptHashService } from '@src/features/auth/infrastructure/services/bcrypt-hash-service';
 import { JwtTokenService } from '@src/features/auth/infrastructure/services/jwt-token-service';
 import { AuthController } from '@src/features/auth/presentation/controllers/auth-controller';
@@ -13,8 +14,9 @@ import { createApiRoutes } from '@src/main/routes';
 
 export const createApp = (): Express => {
   const app = express();
+  const prismaClient = new PrismaClient();
 
-  const userRepository = new InMemoryUserRepository();
+  const userRepository = new PrismaUserRepository(prismaClient);
   const hashService = new BcryptHashService();
   const tokenService = new JwtTokenService(env.JWT_SECRET, env.JWT_EXPIRES_IN);
 

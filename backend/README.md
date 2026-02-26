@@ -9,14 +9,14 @@ This project is a backend starter built with Node.js + TypeScript + Express, fol
    - npm
 2. Install dependencies:
    - `npm install`
-3. Create your local env file:
+3. Create your local env file
    - `cp .env.example .env`
 4. Configure `.env` values:
-   - `PORT=3000`
-   - `NODE_ENV=development`
-   - `JWT_SECRET=<your-secret>`
-   - `JWT_EXPIRES_IN=1h`
-   - Optional DB variable for persistence setups: `DATABASE_URL=postgresql://user:password@localhost:5432/your_db`
+   -Notes:
+      - `DB_*` values are required by the runtime config.
+      - `DATABASE_URL` is required by Prisma (see `backend/prisma/schema.prisma`).
+5. Setup your Mysql server for a new application.
+   - Reference to [this documentation](./documentation/database-setup.md).
 5. Start the API in development mode:
    - `npm run dev`
 6. Verify the server:
@@ -25,7 +25,8 @@ This project is a backend starter built with Node.js + TypeScript + Express, fol
 ### Important DB note
 
 This starter currently uses an in-memory user repository (`src/features/auth/infrastructure/repositories/in-memory-user-repository.ts`), so data is reset whenever the server restarts.
-If you switch to a real database repository, keep `DATABASE_URL` in `.env` and wire that repository in `src/main/app.ts`.
+Even with in-memory auth persistence, startup now performs a fail-fast DB connectivity check before the API listens.
+If DB configuration is missing/invalid or the DB host is unreachable, the server exits before opening the HTTP port.
 
 ## Scripts
 

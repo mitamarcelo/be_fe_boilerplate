@@ -1,12 +1,20 @@
 import request from 'supertest';
 import { Express } from 'express';
+import { PrismaClient } from '@prisma/client';
 import { createApp } from '@src/main/app';
 
 describe('API integration', () => {
   let app: Express;
+  const prisma = new PrismaClient();
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await prisma.user.deleteMany();
     app = createApp();
+  });
+
+  afterAll(async () => {
+    await prisma.user.deleteMany();
+    await prisma.$disconnect();
   });
 
   it('GET /api/v1/health returns status payload', async () => {
@@ -22,9 +30,9 @@ describe('API integration', () => {
     );
   });
 
-  it('POST /api/v1/auth/register returns 201 with valid payload', async () => {
+  it('POST /api/v1/auth/register returns 201 with normalized email', async () => {
     const response = await request(app).post('/api/v1/auth/register').send({
-      email: 'test@example.com',
+      email: 'Test@Example.com',
       password: 'password123'
     });
 
@@ -38,14 +46,17 @@ describe('API integration', () => {
     );
   });
 
-  it('POST /api/v1/auth/register returns 409 for duplicate email', async () => {
+  it('POST /api/v1/auth/register returns 409 for case-variant duplicate email', async () => {
     const payload = {
-      email: 'test@example.com',
+      email: 'Test@Example.com',
       password: 'password123'
     };
 
     await request(app).post('/api/v1/auth/register').send(payload);
-    const duplicate = await request(app).post('/api/v1/auth/register').send(payload);
+    const duplicate = await request(app).post('/api/v1/auth/register').send({
+      email: 'test@example.com',
+      password: 'password123'
+    });
 
     expect(duplicate.status).toBe(409);
   });
@@ -57,7 +68,7 @@ describe('API integration', () => {
     });
 
     const response = await request(app).post('/api/v1/auth/login').send({
-      email: 'test@example.com',
+      email: 'TEST@EXAMPLE.COM',
       password: 'password123'
     });
 
@@ -79,6 +90,26 @@ describe('API integration', () => {
     });
 
     expect(response.status).toBe(401);
+  });
+
+  it('persists users across app recreation for login', async () => {
+    const appA = createApp();
+
+    await request(appA).post('/api/v1/auth/register').send({
+      email: 'persist@example.com',
+      password: 'password123'
+    });
+
+    const appB = createApp();
+    const response = await request(appB).post('/api/v1/auth/login').send({
+      email: 'persist@example.com',
+      password: 'password123'
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      accessToken: expect.any(String)
+    });
   });
 
   it('GET /api/v1/auth/me returns 401 without token', async () => {
