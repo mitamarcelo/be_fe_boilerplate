@@ -1,7 +1,10 @@
+import cors from 'cors';
 import express, { Express } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { LoginUserUseCase } from '@src/features/auth/application/use-cases/login-user.use-case';
+import { LogoutUserUseCase } from '@src/features/auth/application/use-cases/logout-user.use-case';
 import { RegisterUserUseCase } from '@src/features/auth/application/use-cases/register-user.use-case';
+import { PrismaRevokedTokenRepository } from '@src/features/auth/infrastructure/repositories/prisma-revoked-token-repository';
 import { PrismaUserRepository } from '@src/features/auth/infrastructure/repositories/prisma-user-repository';
 import { BcryptHashService } from '@src/features/auth/infrastructure/services/bcrypt-hash-service';
 import { JwtTokenService } from '@src/features/auth/infrastructure/services/jwt-token-service';
@@ -17,16 +20,19 @@ export const createApp = (): Express => {
   const prismaClient = new PrismaClient();
 
   const userRepository = new PrismaUserRepository(prismaClient);
+  const revokedTokenRepository = new PrismaRevokedTokenRepository(prismaClient);
   const hashService = new BcryptHashService();
   const tokenService = new JwtTokenService(env.JWT_SECRET, env.JWT_EXPIRES_IN);
 
   const registerUserUseCase = new RegisterUserUseCase(userRepository, hashService);
   const loginUserUseCase = new LoginUserUseCase(userRepository, hashService, tokenService);
-  const authController = new AuthController(registerUserUseCase, loginUserUseCase);
+  const logoutUserUseCase = new LogoutUserUseCase(revokedTokenRepository);
+  const authController = new AuthController(registerUserUseCase, loginUserUseCase, logoutUserUseCase);
 
   const checkHealthUseCase = new CheckHealthUseCase();
   const healthController = new HealthController(checkHealthUseCase);
 
+  app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
@@ -34,7 +40,8 @@ export const createApp = (): Express => {
     createApiRoutes({
       authController,
       healthController,
-      tokenService
+      tokenService,
+      revokedTokenRepository
     })
   );
 

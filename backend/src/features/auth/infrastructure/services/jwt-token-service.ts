@@ -23,14 +23,16 @@ export class JwtTokenService implements TokenService {
 
       const subject = decoded.sub;
       const email = decoded.email;
+      const exp = decoded.exp;
 
-      if (typeof subject !== 'string' || typeof email !== 'string') {
+      if (typeof subject !== 'string' || typeof email !== 'string' || typeof exp !== 'number') {
         throw new UnauthorizedError('Invalid token payload');
       }
 
       return {
         sub: subject,
-        email
+        email,
+        exp
       };
     } catch (_error) {
       throw new UnauthorizedError('Invalid token');

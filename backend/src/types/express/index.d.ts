@@ -4,6 +4,8 @@ declare global {
       auth?: {
         sub: string;
         email: string;
+        exp?: number;
+        token?: string;
       };
     }
   }

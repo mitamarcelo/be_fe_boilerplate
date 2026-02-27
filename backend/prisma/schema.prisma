@@ -16,3 +16,12 @@ model User {
 
   @@map("users")
 }
+
+model RevokedToken {
+  id        String   @id @default(dbgenerated("(UUID())")) @db.Char(36)
+  token     String   @db.Text
+  revokedAt DateTime @default(now()) @map("revoked_at")
+  expiresAt DateTime @map("expires_at")
+
+  @@map("revoked_tokens")
+}
