@@ -1,8 +1,11 @@
 # Backend + frontend boilerplate
 
-This repo is a backend + frontend monorepo that bootstraps a small project using my preferred stack.
+This repo is a full-stack boilerplate for spinning up small projects quickly. It includes a clean-architecture API and a modern React client.
 
-I use it to spin up new projects for studying and quick prototypes.
+## Documentation
+
+- Backend setup, stack, and usage: [backend/README.md](./backend/README.md)
+- Frontend setup, stack, and usage: [frontend/README.md](./frontend/README.md)
 
 ## How to use
 
@@ -15,18 +18,3 @@ I use it to spin up new projects for studying and quick prototypes.
 
 - `backend/` API server and database access
 - `frontend/` Web client
-
-## Backend stack
-
-- Node.js
-- TypeScript
-- Prisma (MySQL provider)
-
-## Frontend stack
-
-> TBD (to be documented)
-
-## Next steps
-
-- Document backend setup and common workflows.
-- Add frontend stack details and scripts.

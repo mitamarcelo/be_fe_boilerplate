@@ -2,6 +2,17 @@
 
 This project is a backend starter built with Node.js + TypeScript + Express, following a feature-first clean architecture.
 
+## Stack
+
+- Node.js (>=20)
+- TypeScript
+- Express
+- Prisma (MySQL provider)
+- Zod validation
+- JWT authentication
+- Jest + Supertest
+- ESLint + Prettier
+
 ## How to use
 
 1. Install prerequisites:
@@ -9,17 +20,20 @@ This project is a backend starter built with Node.js + TypeScript + Express, fol
    - npm
 2. Install dependencies:
    - `npm install`
-3. Create your local env file
+3. Create your local env file:
    - `cp .env.example .env`
 4. Configure `.env` values:
-   -Notes:
-      - `DB_*` values are required by the runtime config.
-      - `DATABASE_URL` is required by Prisma (see `backend/prisma/schema.prisma`).
-5. Setup your Mysql server for a new application.
-   - Reference to [this documentation](./documentation/database-setup.md).
-5. Start the API in development mode:
+   - Notes:
+     - `DB_*` values are required by the runtime config.
+     - `DATABASE_URL` is required by Prisma (see `backend/prisma/schema.prisma`).
+5. Set up your MySQL server for a new application:
+   - Reference [this documentation](./documentation/database-setup.md).
+6. (Optional) Generate and migrate Prisma schema:
+   - `npm run prisma:generate`
+   - `npm run prisma:migrate`
+7. Start the API in development mode:
    - `npm run dev`
-6. Verify the server:
+8. Verify the server:
    - Open `http://localhost:3000/api/v1/health`
 
 ### Important DB note
